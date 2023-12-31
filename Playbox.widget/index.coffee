@@ -17,9 +17,9 @@ options =
   metaPosition: "outside"                # inside | outside
 
   # Stick the widget in the corner? Set to *true* if you're using it with Sidebar widget, set to *false* if you'd like to give it some breathing room and a drop shadow.
-  stickInCorner: true                  # true | false
+  stickInCorner: false                  # true | false
 
-command: "osascript 'Playbox.widget/lib/Get Current Track.applescript'"
+command: "osascript 'Playbox.widget/Playbox.widget/lib/Get Current Track.applescript'"
 refreshFrequency: '2s'
 
 style: """
@@ -51,7 +51,7 @@ style: """
 
   if #{options.stickInCorner} == false
     margin = 20px
-    box-shadow 0 20px 40px 0px rgba(0,0,0,.6)
+    box-shadow 0 20px 40px 0px rgba(0,0,0,.3)
     border-radius 6px
     .text
       border-radius 0 0 6px 6px
