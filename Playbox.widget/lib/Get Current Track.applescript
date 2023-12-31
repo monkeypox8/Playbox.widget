@@ -1,5 +1,5 @@
 global artistName, songName, albumName, songRating, songDuration, currentPosition, musicapp, apiKey, songMetaFile, mypath, currentCoverURL, isLoved
-set metaToGrab to {"artistName", "songName", "albumName", "songDuration", "currentPosition", "coverURL", "songChanged", "isLoved", "darkMode"}
+set metaToGrab to {"artistName", "songName", "albumName", "songDuration", "currentPosition", "coverURL", "songChanged", "isLoved"}
 property enableLogging : false --- options: true | false
 
 set apiKey to "2e8c49b69df3c1cf31aaa36b3ba1d166"
@@ -17,19 +17,18 @@ set songMetaFile to (mypath & "songMeta.plist" as string)
 
 
 if isMusicPlaying() is true then
-	pruneCovers()
+	my pruneCovers()
 	getSongMeta()
 	writeSongMeta({"currentPosition" & "##" & currentPosition})
-	writeSongMeta({"darkMode" & "##" & checkDarkMode()})
-	
+
 	if didSongChange() is true then
 		delay 1
-		writeSongMeta({Â
-			"artistName" & "##" & artistName, Â
-			"songName" & "##" & songName, Â
-			"songDuration" & "##" & songDuration, Â
-			"isLoved" & "##" & isLoved, Â
-			"songChanged" & "##" & Â
+		writeSongMeta({Â¬
+			"artistName" & "##" & artistName, Â¬
+			"songName" & "##" & songName, Â¬
+			"songDuration" & "##" & songDuration, Â¬
+			"isLoved" & "##" & isLoved, Â¬
+			"songChanged" & "##" & Â¬
 			true})
 		if didCoverChange() is true then
 			set savedCoverURL to my readSongMeta({"coverURL"})
@@ -38,8 +37,8 @@ if isMusicPlaying() is true then
 		end if
 		writeSongMeta({"albumName" & "##" & albumName})
 	else
-		writeSongMeta({Â
-			"songChanged" & "##" & false, Â
+		writeSongMeta({Â¬
+			"songChanged" & "##" & false, Â¬
 			"isLoved" & "##" & isLoved})
 	end if
 else
@@ -53,13 +52,13 @@ spitOutput(metaToGrab) as string
 ------------------------------------------------
 
 on isMusicPlaying()
-	set apps to {"iTunes", "Spotify"}
+	set apps to {"Music", "Spotify"}
 	set answer to false
 	repeat with anApp in apps
 		tell application "System Events" to set isRunning to (name of processes) contains anApp
 		if isRunning is true then
 			try
-				using terms from application "iTunes"
+				using terms from application "Music"
 					tell application anApp
 						if player state is playing then
 							set musicapp to (anApp as string)
@@ -78,11 +77,11 @@ end isMusicPlaying
 on getSongMeta()
 	try
 		set musicAppReference to a reference to application musicapp
-		using terms from application "iTunes"
+		using terms from application "Music"
 			try
 				tell musicAppReference
 					set {artistName, songName, albumName, songDuration} to {artist, name, album, duration} of current track
-					if musicapp is "iTunes" then
+					if musicapp is "Music" then
 						set isLoved to loved of current track as string
 					else if musicapp is "Spotify" then
 						try
@@ -132,8 +131,8 @@ end didCoverChange
 
 on grabCover()
 	try
-		if musicapp is "iTunes" then
-			tell application "iTunes" to tell current track
+		if musicapp is "Music" then
+			tell application "Music" to tell current track
 				if exists (every artwork) then
 					my getLocaliTunesArt()
 				else
@@ -151,9 +150,9 @@ on grabCover()
 end grabCover
 
 on getLocaliTunesArt()
-	tell application "iTunes" to tell artwork 1 of current track -- get the raw bytes of the artwork into a var
+	tell application "Music" to tell artwork 1 of current track -- get the raw bytes of the artwork into a var
 		set srcBytes to raw data
-		if format is Çclass PNG È then -- figure out the proper file extension
+		if format is Â«class PNG Â» then -- figure out the proper file extension
 			set ext to ".png"
 		else
 			set ext to ".jpg"
@@ -214,14 +213,6 @@ on pruneCovers()
 	end try
 end pruneCovers
 
-on checkDarkMode()
-	try
-		tell application "System Events" to tell appearance preferences to return dark mode
-	on error
-		return false
-	end try
-end checkDarkMode
-
 on getPathItem(aPath)
 	set AppleScript's text item delimiters to "/"
 	set countItems to count text items of aPath
@@ -242,7 +233,7 @@ on readSongMeta(keyNames)
 				my writeSongMeta({keyName & "##" & "NA"})
 				set keyValue to value of property list item keyName
 			end try
-			
+
 			copy keyValue to the end of valueList
 		end repeat
 	end tell
@@ -255,7 +246,7 @@ on writeSongMeta(keys)
 			-- create an empty property list dictionary item
 			set the parent_dictionary to make new property list item with properties {kind:record}
 			-- create new property list file using the empty dictionary list item as contents
-			set this_plistfile to Â
+			set this_plistfile to Â¬
 				make new property list file with properties {contents:parent_dictionary, name:songMetaFile}
 		end if
 		try
@@ -264,7 +255,7 @@ on writeSongMeta(keys)
 				set keyName to text item 1 of aKey
 				set keyValue to text item 2 of aKey
 				set AppleScript's text item delimiters to ""
-				make new property list item at end of property list items of contents of property list file songMetaFile Â
+				make new property list item at end of property list items of contents of property list file songMetaFile Â¬
 					with properties {kind:string, name:keyName, value:keyValue}
 			end repeat
 		on error e
@@ -317,7 +308,7 @@ on number_to_string(this_number)
 		set x to the offset of "." in this_number
 		set y to the offset of "+" in this_number
 		set z to the offset of "E" in this_number
-		set the decimal_adjust to characters (y - (length of this_number)) thru Â
+		set the decimal_adjust to characters (y - (length of this_number)) thru Â¬
 			-1 of this_number as string as number
 		if x is not 0 then
 			set the first_part to characters 1 thru (x - 1) of this_number as string
@@ -328,7 +319,7 @@ on number_to_string(this_number)
 		set the converted_number to the first_part
 		repeat with i from 1 to the decimal_adjust
 			try
-				set the converted_number to Â
+				set the converted_number to Â¬
 					the converted_number & character i of the second_part
 			on error
 				set the converted_number to the converted_number & "0"
